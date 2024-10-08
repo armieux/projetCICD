@@ -19,6 +19,9 @@ app.delete('/api/groups/:groupId/users/:userId', groupController.removeUserFromG
 app.get('/api/users', userController.getUsers);
 app.post('/api/users', userController.createUser);
 
+// Route par défault pour voir si le serveur marche
+
+
 
 // Démarrer le serveur
 app.listen(PORT, () => {
