@@ -31,7 +31,7 @@ app.get('/', (req, res) => {
         console.log('Connection has been established successfully.');
 
         // Synchronize models with the database, forcing table creation
-        await db.sync({ force: true });
+        await db.sync({ force: false });
         console.log('Database synchronized.');
 
         app.listen(PORT, () => {
