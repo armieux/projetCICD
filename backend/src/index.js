@@ -2,40 +2,22 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 4949;
 
+// Import des controllers
+const groupController = require('./controllers/groupController');
+const userController = require('./controllers/userController');
+
 // Middleware pour parser le JSON
 app.use(express.json());
 
 // Routes pour les groupes
-app.get('/api/groups', (req, res) => {
-    // Logique pour récupérer la liste des groupes
-    res.send('GET /api/groups'); 
-});
-
-app.post('/api/groups', (req, res) => {
-    // Logique pour créer un nouveau groupe
-    res.send('POST /api/groups');
-});
-
-app.post('/api/groups/:groupId/users', (req, res) => {
-    // Logique pour ajouter un utilisateur à un groupe
-    res.send('POST /api/groups/:groupId/users');
-});
-
-app.delete('/api/groups/:groupId/users/:userId', (req, res) => {
-    // Logique pour retirer un utilisateur d'un groupe
-    res.send('DELETE /api/groups/:groupId/users/:userId');
-});
+app.get('/api/groups', groupController.getGroups);
+app.post('/api/groups', groupController.createGroup);
+app.post('/api/groups/:groupId/users', groupController.addUserToGroup);
+app.delete('/api/groups/:groupId/users/:userId', groupController.removeUserFromGroup);
 
 // Routes pour les utilisateurs
-app.get('/api/users', (req, res) => {
-    // Logique pour récupérer la liste des utilisateurs
-    res.send('GET /api/users');
-});
-
-app.post('/api/users', (req, res) => {
-    // Logique pour créer un nouvel utilisateur
-    res.send('POST /api/users');
-});
+app.get('/api/users', userController.getUsers);
+app.post('/api/users', userController.createUser);
 
 
 // Démarrer le serveur
