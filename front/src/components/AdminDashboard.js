@@ -1,50 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import apiService from '../services/apiService';
+import GroupList from './GroupList';
+import UserList from './UserList';
 
-function AdminDashboard() {
-    const [numUsers, setNumUsers] = useState(0);
-    const [numGroups, setNumGroups] = useState(0);
-    const [lastGroupConfig, setLastGroupConfig] = useState('LAST_MIN');
+const AdminDashboard = () => {
+    const [groups, setGroups] = useState([]);
+    const [users, setUsers] = useState([]);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Send the data to the server
-        console.log({ numUsers, numGroups, lastGroupConfig });
+    useEffect(() => {
+        const loadGroups = async () => {
+            try {
+                const fetchedGroups = await apiService.fetchGroups();
+                setGroups(fetchedGroups);
+            } catch (error) {
+                console.error('Erreur lors de la récupération des groupes:', error);
+            }
+        };
+
+        const loadUsers = async () => {
+            try {
+                const fetchedUsers = await apiService.fetchUsers();
+                setUsers(fetchedUsers);
+            } catch (error) {
+                console.error('Erreur lors de la récupération des utilisateurs:', error);
+            }
+        };
+
+        loadGroups();
+        loadUsers();
+    }, []);
+
+    const createGroup = async () => {
+        try {
+            const newGroup = await apiService.createGroup();
+            setGroups((prevGroups) => [...prevGroups, newGroup]);
+        } catch (error) {
+            console.error('Erreur lors de la création du groupe:', error);
+        }
+    };
+
+    const addUserToGroup = async (userId, groupId) => {
+        try {
+            await apiService.addUserToGroup(userId, groupId);
+            setGroups((prevGroups) => prevGroups.map(group => {
+                if (group.id === groupId) {
+                    return { ...group, members: [...group.members, userId] };
+                }
+                return group;
+            }));
+        } catch (error) {
+            console.error('Erreur lors de l\'ajout de l\'utilisateur au groupe:', error);
+        }
+    };
+
+    const removeUserFromGroup = async (userId, groupId) => {
+        try {
+            await apiService.removeUserFromGroup(userId, groupId);
+            setGroups((prevGroups) => prevGroups.map(group => {
+                if (group.id === groupId) {
+                    return { ...group, members: group.members.filter(memberId => memberId !== userId) };
+                }
+                return group;
+            }));
+        } catch (error) {
+            console.error('Erreur lors du retrait de l\'utilisateur du groupe:', error);
+        }
     };
 
     return (
         <div>
             <h1>Admin Dashboard</h1>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Nombre d'utilisateurs :</label>
-                    <input
-                        type="number"
-                        value={numUsers}
-                        onChange={(e) => setNumUsers(Number(e.target.value))}
-                    />
-                </div>
-                <div>
-                    <label>Nombre de groupes :</label>
-                    <input
-                        type="number"
-                        value={numGroups}
-                        onChange={(e) => setNumGroups(Number(e.target.value))}
-                    />
-                </div>
-                <div>
-                    <label>Configuration du dernier groupe :</label>
-                    <select
-                        value={lastGroupConfig}
-                        onChange={(e) => setLastGroupConfig(e.target.value)}
-                    >
-                        <option value="LAST_MIN">LAST_MIN</option>
-                        <option value="LAST_MAX">LAST_MAX</option>
-                    </select>
-                </div>
-                <button type="submit">Configurer les groupes</button>
-            </form>
+            <button onClick={createGroup}>Créer un groupe</button>
+            <GroupList groups={groups} />
+            <UserList users={users} addUserToGroup={addUserToGroup} removeUserFromGroup={removeUserFromGroup} />
         </div>
     );
-}
+};
 
 export default AdminDashboard;
