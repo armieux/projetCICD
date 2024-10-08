@@ -1,0 +1,21 @@
+### Get all groups
+GET http://localhost:4949/api/groups
+
+### Create a new group
+POST http://localhost:4949/api/groups
+Content-Type: application/json
+
+{
+    "name": "New Group"
+}
+
+### Add a user to a group
+POST http://localhost:4949/api/groups/1/users 
+Content-Type: application/json
+
+{
+    "userId": 1 
+}
+
+### Remove a user from a group
+DELETE http://localhost:4949/api/groups/1/users/1
