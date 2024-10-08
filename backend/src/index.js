@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 4949;
+const db = require('./config/database'); // Import the database connection
 
 // Import des controllers
 const groupController = require('./controllers/groupController');
@@ -24,6 +25,20 @@ app.get('/', (req, res) => {
 });
 
 // Démarrer le serveur
-app.listen(PORT, () => {
-    console.log(`Serveur en cours d'exécution sur http://localhost:${PORT}`);
-});
+(async () => {
+    try {
+        await db.authenticate();
+        console.log('Connection has been established successfully.');
+
+        // Synchronize models with the database, forcing table creation
+        await db.sync({ force: true });
+        console.log('Database synchronized.');
+
+        app.listen(PORT, () => {
+            console.log(`Serveur en cours d'exécution sur http://localhost:${PORT}`);
+        });
+
+    } catch (error) {
+        console.error('Unable to connect to the database:', error);
+    }
+})();
