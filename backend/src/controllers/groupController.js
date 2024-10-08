@@ -3,7 +3,7 @@ const Group = require('../models/group'); // Assurez-vous d'avoir un modèle Gro
 // Récupérer la liste des groupes
 exports.getGroups = async (req, res) => {
     try {
-        const groups = await Group.find();
+        const groups = await Group.findAll();
         res.status(200).json(groups);
     } catch (error) {
         res.status(500).json({ message: error.message });
