@@ -1,0 +1,8 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    environment:
+      NODE_ENV: production
+    ports:
+      - 4949:4949
