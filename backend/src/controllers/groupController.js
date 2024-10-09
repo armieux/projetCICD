@@ -2,16 +2,6 @@ const Group = require('../models/group'); // Assurez-vous d'avoir un modèle Gro
 const User = require('../models/user'); // Ensure you import the User model
 const GroupInvitation = require('../models/group-invitation'); // Assurez-vous d'avoir un modèle GroupInvitation
 
-// Récupérer la liste des groupes
-exports.getGroups = async (req, res) => {
-    try {
-        const groups = await Group.findAll();
-        res.status(200).json(groups);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
 // Créer un lien d'invitation pour un groupe
 exports.createGroupInvitation = async (req, res) => {
     const userId = req.body.userId;
@@ -34,50 +24,50 @@ exports.createGroupInvitation = async (req, res) => {
     }
 };
 
-// Ajouter un utilisateur à un groupe
-exports.addUserToGroup = async (req, res) => {
+// Récupérer la liste des groupes
+exports.getGroups = async (req, res) => {
     try {
-        const group = await Group.findByPk(req.params.groupId);
-        if (!group) {
-            return res.status(404).json({ message: 'Group not found' });
-        }
-        // Check if user already exists in the group
-        if (!group.users.includes(req.params.userId)) {
-            group.users.push(req.params.userId); // Assuming users is an array
-            await group.save();
-        }
-        res.status(200).json(group);
+        const groups = await Group.findAll({
+            include: {
+                model: User,
+                as: 'Users', // Make sure this matches the alias defined in the association if any
+                attributes: ['id', 'firstname', 'lastname', 'email'], // Specify the fields you want to include
+                through: { attributes: [] } // Exclude the join table attributes
+            }
+        });
+        res.status(200).json(groups);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Créer un nouveau groupe
+exports.createGroup = async (req, res) => {
+    const newGroup = new Group(req.body);
+    try {
+        const savedGroup = await newGroup.save();
+        res.status(201).json(savedGroup);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 };
 
-// Retirer un utilisateur d'un groupe
-exports.removeUserFromGroup = async (req, res) => {
-    try {
-        const group = await Group.findByPk(req.params.groupId);
-        if (!group) {
-            return res.status(404).json({ message: 'Group not found' });
-        }
-        // Ensure user is part of the group before attempting to remove
-        const userIndex = group.users.indexOf(req.params.userId);
-        if (userIndex > -1) {
-            group.users.splice(userIndex, 1); // Remove user from array
-            await group.save();
-        }
-        res.status(200).json(group);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};// Ajouter un utilisateur à un groupe
+// Ajouter un utilisateur à un groupe
 exports.addUserToGroup = async (req, res) => {
     try {
         // Find the group and include the associated users
-        const group = await Group.findByPk(req.params.groupId, { include: User });
+        const group = await Group.findByPk(req.params.groupId, {
+            include: {
+                model: User,
+                as: 'Users',
+                attributes: ['id', 'firstname', 'lastname', 'email'],
+                through: { attributes: [] } // Exclude the join table attributes
+            }
+        });
+
         if (!group) {
             return res.status(404).json({ message: 'Group not found' });
         }
-
 
         // Check if user is already in the group
         const userAlreadyInGroup = group.Users.some(user => user.id === parseInt(req.body.userId));
@@ -88,41 +78,92 @@ exports.addUserToGroup = async (req, res) => {
             }
 
             await group.addUser(user); // Use Sequelize's addUser method for many-to-many relationships
-            res.status(200).json({ message: 'User added to group', group });
+
+            // Reload the group with updated users
+            const updatedGroup = await Group.findByPk(req.params.groupId, {
+                include: {
+                    model: User,
+                    as: 'Users',
+                    attributes: ['id', 'firstname', 'lastname', 'email'],
+                    through: { attributes: [] }
+                }
+            });
+
+            return res.status(200).json({ message: 'User added to group', group: updatedGroup });
         } else {
-            res.status(400).json({ message: 'User already in group' });
+            return res.status(400).json({ message: 'User already in group' });
         }
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        return res.status(400).json({ message: error.message });
     }
 };
+
 
 // Retirer un utilisateur d'un groupe
 exports.removeUserFromGroup = async (req, res) => {
     try {
         // Find the group and include the associated users
-        const group = await Group.findByPk(req.params.groupId, { include: User });
+        const group = await Group.findByPk(req.params.groupId, {
+            include: {
+                model: User,
+                as: 'Users',
+                attributes: ['id', 'firstname', 'lastname', 'email'],
+                through: { attributes: [] } // Exclude the join table attributes
+            }
+        });
+
         if (!group) {
             return res.status(404).json({ message: 'Group not found' });
         }
 
         // Check if user is in the group
-        const userInGroup = group.Users.some(user => user.id === parseInt(req.body.userId));
+        const userInGroup = group.Users.some(user => user.id === parseInt(req.params.userId));
         if (userInGroup) {
-            const user = await User.findByPk(req.body.userId);
+            const user = await User.findByPk(req.params.userId);
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
 
             await group.removeUser(user); // Use Sequelize's removeUser method for many-to-many relationships
-            res.status(200).json({ message: 'User removed from group', group });
+
+            // Reload the group with updated users
+            const updatedGroup = await Group.findByPk(req.params.groupId, {
+                include: {
+                    model: User,
+                    as: 'Users',
+                    attributes: ['id', 'firstname', 'lastname', 'email'],
+                    through: { attributes: [] }
+                }
+            });
+
+            return res.status(200).json({ message: 'User removed from group', group: updatedGroup });
         } else {
-            res.status(400).json({ message: 'User not in group' });
+            return res.status(400).json({ message: 'User not in group' });
         }
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        return res.status(400).json({ message: error.message });
     }
 };
+
+// Delete a group
+exports.deleteGroup = async (req, res) => {
+    try {
+        const group = await Group.findByPk(req.params.groupId);
+
+        if (!group) {
+            return res.status(404).json({ message: 'Group not found' });
+        }
+
+        // Delete the group
+        await group.destroy();
+
+        res.status(200).json({ message: 'Group deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
 
 // Join a group using an invitation link
 exports.respondToInvitation = async (req, res) => {

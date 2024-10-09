@@ -13,6 +13,8 @@ app.use(express.json());
 app.get('/api/groups', groupController.getGroups);
 app.post('/api/groups/create', groupController.createGroupInvitation);
 app.post('/api/groups/invitations/:inviteId/respond', groupController.respondToInvitation);
+app.post('/api/groups', groupController.createGroup);
+app.delete('/api/groups/:groupId', groupController.deleteGroup);
 app.post('/api/groups/:groupId/users', groupController.addUserToGroup);
 app.delete('/api/groups/:groupId/users/:userId', groupController.removeUserFromGroup);
 

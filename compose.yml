@@ -26,6 +26,23 @@ services:
     ports:
       - "3000:80" # Redirect port 3000 to 80
     restart: unless-stopped
+  jenkins:
+    build:
+      context: ./jenkins
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    container_name: jenkins
+    restart: unless-stopped
+    ports:
+      - "8081:8080"  # Jenkins UI
+      - "50000:50000" # For Jenkins agent
+    volumes:
+      - ./jenkins/jenkins_home:/var/jenkins_home
+    environment:
+      - JENKINS_ADMIN_ID=admin
+      - JENKINS_ADMIN_PASSWORD=admin_password
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false # Disable setup wizard (optional)
 
 volumes:
   postgres_data:
