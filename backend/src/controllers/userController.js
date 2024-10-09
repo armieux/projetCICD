@@ -1,4 +1,4 @@
-const User = require('../models/user'); // Assurez-vous d'avoir un modèle User
+const User = require('../models/user');
 
 // Récupérer la liste des utilisateurs
 exports.getUsers = async (req, res) => {
@@ -20,3 +20,17 @@ exports.createUser = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+// Logger un utilisateur par son email
+exports.loginUser = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await User.findOne({ where: { email } });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}

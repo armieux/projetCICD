@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 
 // Import controllers
@@ -17,10 +18,13 @@ app.delete('/api/groups/:groupId/users/:userId', groupController.removeUserFromG
 // Routes for users
 app.get('/api/users', userController.getUsers);
 app.post('/api/users', userController.createUser);
+app.post('/api/users/login', userController.loginUser);
 
 // Default route to check if the server is working
 app.get('/', (req, res) => {
     res.send('Le serveur fonctionne correctement !');
 });
+
+app.use(cors());
 
 module.exports = app; // Export the app for use in server.js
