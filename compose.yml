@@ -17,7 +17,12 @@ services:
     environment:
       NODE_ENV: production
     ports:
-      - 4949:4949
-
-volumes:
-  postgres_data:
+      - "4949:4949"
+  react-app:
+    build:
+      context: ./front
+    depends_on:
+      - backend
+    ports:
+      - "3000:80" # Redirect port 3000 to 80
+    restart: unless-stopped
