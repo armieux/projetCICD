@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="5" failures="0" errors="0" time="1.236">
+  <testsuite name="apiService" errors="0" failures="0" skipped="0" timestamp="2024-10-09T14:32:09" time="0.546" tests="1">
+    <testcase classname="apiService fetchGroups calls fetch and returns an array" name="apiService fetchGroups calls fetch and returns an array" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="Group" errors="0" failures="0" skipped="0" timestamp="2024-10-09T14:32:09" time="0.55" tests="3">
+    <testcase classname="Group should create a group with an id" name="Group should create a group with an id" time="0.002">
+    </testcase>
+    <testcase classname="Group should add a member to the group" name="Group should add a member to the group" time="0.001">
+    </testcase>
+    <testcase classname="Group should remove a member from the group" name="Group should remove a member from the group" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="undefined" errors="0" failures="0" skipped="0" timestamp="2024-10-09T14:32:09" time="0.711" tests="1">
+    <testcase classname=" renders learn react link" name=" renders learn react link" time="0.039">
+    </testcase>
+  </testsuite>
+</testsuites>
