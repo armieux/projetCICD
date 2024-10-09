@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import LoginForm from './LoginFormComponent';
+import RegisterForm from './RegisterFormComponent';
 
 function UserDashboard() {
     const [groupLink, setGroupLink] = useState('');
@@ -38,6 +40,18 @@ function UserDashboard() {
                     <p>Membres : {groupInfo.members.join(', ')}</p>
                 </div>
             )}
+
+            <br />
+
+            <div>
+                <LoginForm />
+            </div>
+
+            <br />
+
+            <div>
+                <RegisterForm />
+            </div>
         </div>
     );
 }
