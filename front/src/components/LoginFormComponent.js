@@ -7,16 +7,16 @@ function LoginForm() {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        // try {
-        const user = await userService.loginUser(email);
-        if (user) {
-            setIsLoggedIn(true);
-            // Store the user's connected state in the front, e.g., in local storage or context
-            localStorage.setItem('userId', user.id);
+        try {
+            const user = await userService.loginUser(email);
+            if (user) {
+                setIsLoggedIn(true);
+                // Store the user's connected state in the front, e.g., in local storage or context
+                localStorage.setItem('userId', user.id);
+            }
+        } catch (error) {
+            alert(error.message);
         }
-        // } catch (error) {
-        //     alert(error.message);
-        // }
     };
 
     return (
