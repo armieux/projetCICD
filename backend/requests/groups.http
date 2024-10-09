@@ -10,12 +10,12 @@ Content-Type: application/json
 }
 
 ### Add a user to a group
-POST http://localhost:4949/api/groups/1/users 
+POST http://localhost:4949/api/groups/2/users
 Content-Type: application/json
 
 {
-    "userId": 1 
+    "userId": 20
 }
 
 ### Remove a user from a group
-DELETE http://localhost:4949/api/groups/1/users/1
+DELETE http://localhost:4949/api/groups/2/users/20
