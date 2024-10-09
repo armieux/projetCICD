@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:3001'; // TODO : Replace with correct server URL
+const BASE_URL = 'http://localhost:4949';
 
 const apiService = {
     async fetchGroups() {
@@ -61,10 +61,24 @@ const apiService = {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ userData }),
+            body: JSON.stringify(userData),
         });
         if (!response.ok) {
             throw new Error('Erreur lors de la création de l\'utilisateur');
+        }
+        return await response.json();
+    },
+
+    async loginUser(email) {
+        const response = await fetch(`${BASE_URL}/api/users/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email }),
+        });
+        if (!response.ok) {
+            throw new Error('Échec de la connexion');
         }
         return await response.json();
     },
