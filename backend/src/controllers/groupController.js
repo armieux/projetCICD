@@ -71,7 +71,6 @@ exports.addUserToGroup = async (req, res) => {
         const userAlreadyInGroup = group.Users.some(user => user.id === parseInt(req.body.userId));
         if (!userAlreadyInGroup) {
             const user = await User.findByPk(req.body.userId);
-            console.log(user,req);
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
