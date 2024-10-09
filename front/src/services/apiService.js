@@ -9,16 +9,17 @@ const apiService = {
         return await response.json();
     },
 
-    async createGroup(groupData) {
-        const response = await fetch(`${BASE_URL}/api/groups`, {
+    async createGroup() {
+        const userId = localStorage.getItem('userId');
+        const response = await fetch(`${BASE_URL}/api/groups/create`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ groupData }),
+            body: JSON.stringify({ userId }),
         });
         if (!response.ok) {
-            throw new Error('Erreur lors de la création du groupe');
+            throw new Error('Erreur lors de la création du lien du groupe');
         }
         return await response.json();
     },
@@ -43,6 +44,30 @@ const apiService = {
         });
         if (!response.ok) {
             throw new Error('Erreur lors du retrait de l\'utilisateur du groupe');
+        }
+        return await response.json();
+    },
+
+    async deleteGroup(groupId) {
+        const response = await fetch(`${BASE_URL}/api/groups/${groupId}`, {
+            method: 'DELETE',
+        });
+        if (!response.ok) {
+            throw new Error('Erreur lors de la suppression du groupe');
+        }
+        return await response.json();
+    },
+
+    async respondToInvitation(inviteId, userId) {
+        const response = await fetch(`${BASE_URL}/api/groups/invitations/${inviteId}/respond`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId }),
+        });
+        if (!response.ok) {
+            throw new Error('Erreur lors de la réponse à l\'invitation');
         }
         return await response.json();
     },

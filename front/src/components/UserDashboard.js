@@ -1,14 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LoginForm from './LoginFormComponent';
 import RegisterForm from './RegisterFormComponent';
+import groupService from '../services/groupService';
 
 function UserDashboard() {
     const [groupLink, setGroupLink] = useState('');
     const [groupInfo, setGroupInfo] = useState(null);
 
-    const handleCreateGroup = () => {
-        // Create a link for the user to share with others (API call to come)
-        setGroupLink(`https://groupmanager.com/invite/${Math.random().toString(36).substr(2, 9)}`);
+    const userId = localStorage.getItem('userId');
+
+    useEffect(() => {
+        // Whenever groupLink changes, update localStorage
+        localStorage.setItem('groupLink', groupLink);
+    }, [groupLink]);
+
+    const handleCreateGroup = async () => {
+        try {
+            const groupData = await groupService.createGroup();
+            const link = `http://localhost:3000/invitation/${groupData.inviteId}`; // Assuming the API returns an inviteId
+            setGroupLink(link);
+        } catch (error) {
+            alert(error.message);
+        }
     };
 
     const handleJoinGroup = (link) => {
@@ -24,8 +37,9 @@ function UserDashboard() {
     return (
         <div>
             <h1>User Dashboard</h1>
+            {userId && <p>User ID: {userId}</p>}
             <div>
-                <button onClick={handleCreateGroup}>Créer un groupe</button>
+                {!groupLink && <button onClick={handleCreateGroup}>Créer un groupe</button>}
                 {groupLink && <p>Lien d'invitation : <a href={groupLink}>{groupLink}</a></p>}
             </div>
             <div>
@@ -43,14 +57,24 @@ function UserDashboard() {
 
             <br />
 
-            <div>
-                <LoginForm />
-            </div>
+            {!userId && (
+                <>
+                    <div>
+                        <LoginForm />
+                    </div>
+
+                    <br />
+
+                    <div>
+                        <RegisterForm />
+                    </div>
+                </>
+            )}
 
             <br />
 
             <div>
-                <RegisterForm />
+                <button onClick={() => localStorage.clear()}>Déconnexion</button>
             </div>
         </div>
     );

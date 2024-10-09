@@ -20,7 +20,6 @@ const User = sequelize.define('User', {
         allowNull: false,
         unique: true
     }
-    // Ajoutez d'autres champs selon vos besoins
 });
 
 module.exports = User;
